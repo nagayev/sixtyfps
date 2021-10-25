@@ -16,6 +16,9 @@ x11 = ["sixtyfps-rendering-backend-default/x11"]
 wayland = ["sixtyfps-rendering-backend-default/wayland"]
 backend-gl = ["sixtyfps-rendering-backend-default/sixtyfps-rendering-backend-gl"]
 backend-qt = ["sixtyfps-rendering-backend-default/sixtyfps-rendering-backend-qt"]
+# This is temporary until we have a software backend & feature. We can't release with a dependency to testing args
+# that crate is not released.
+backend-testing = ["sixtyfps-rendering-backend-testing"]
 default = ["backend-gl", "x11", "backend-qt"]
 
 [dependencies]
@@ -24,7 +27,8 @@ sixtyfps-macros = { version = "=0.1.4", path = "sixtyfps-macros" }
 const-field-offset = { version = "0.1", path = "../../helper_crates/const-field-offset" }
 vtable = { version = "0.1.2", path = "../../helper_crates/vtable" }
 sixtyfps-corelib = { version = "=0.1.4", path="../../sixtyfps_runtime/corelib" }
-sixtyfps-rendering-backend-default = { version = "=0.1.4", path="../../sixtyfps_runtime/rendering_backends/default" }
+sixtyfps-rendering-backend-default = { version = "=0.1.4", path="../../sixtyfps_runtime/rendering_backends/default", optional = true }
+sixtyfps-rendering-backend-testing = { version = "=0.1.4", path="../../sixtyfps_runtime/rendering_backends/testing", optional = true }
 pin-weak = "1"
 
 [package.metadata.docs.rs]

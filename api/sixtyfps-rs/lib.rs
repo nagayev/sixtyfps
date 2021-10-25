@@ -225,12 +225,22 @@ pub use sixtyfps_corelib::sharedvector::SharedVector;
 pub use sixtyfps_corelib::string::SharedString;
 pub use sixtyfps_corelib::timers::{Timer, TimerMode};
 
+#[cfg(feature = "backend-testing")]
+fn backend() -> &'static dyn sixtyfps_corelib::backend::Backend {
+    sixtyfps_rendering_backend_testing::init()
+}
+
+#[cfg(not(feature = "backend-testing"))]
+fn backend() -> &'static dyn sixtyfps_corelib::backend::Backend {
+    sixtyfps_rendering_backend_default::backend()
+}
+
 /// This function can be used to register a custom TrueType font with SixtyFPS,
 /// for use with the `font-family` property. The provided slice must be a valid TrueType
 /// font.
 #[doc(hidden)]
 pub fn register_font_from_memory(data: &'static [u8]) -> Result<(), Box<dyn std::error::Error>> {
-    sixtyfps_rendering_backend_default::backend().register_font_from_memory(data)
+    backend().register_font_from_memory(data)
 }
 
 /// This function can be used to register a custom TrueType font with SixtyFPS,
@@ -240,7 +250,7 @@ pub fn register_font_from_memory(data: &'static [u8]) -> Result<(), Box<dyn std:
 pub fn register_font_from_path<P: AsRef<std::path::Path>>(
     path: P,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    sixtyfps_rendering_backend_default::backend().register_font_from_path(path.as_ref())
+    backend().register_font_from_path(path.as_ref())
 }
 
 /// internal re_exports used by the macro generated
@@ -280,6 +290,7 @@ pub mod re_exports {
     pub use sixtyfps_corelib::ComponentVTable_static;
     pub use sixtyfps_corelib::SharedString;
     pub use sixtyfps_corelib::SharedVector;
+    #[cfg(not(feature = "backend-testing"))]
     pub use sixtyfps_rendering_backend_default::native_widgets::*;
     pub use vtable::{self, *};
 }
@@ -401,14 +412,14 @@ pub mod internal {
 /// Creates a new window to render components in.
 #[doc(hidden)]
 pub fn create_window() -> re_exports::WindowRc {
-    sixtyfps_rendering_backend_default::backend().create_window()
+    backend().create_window()
 }
 
 /// Enters the main event loop. This is necessary in order to receive
 /// events from the windowing system in order to render to the screen
 /// and react to user input.
 pub fn run_event_loop() {
-    sixtyfps_rendering_backend_default::backend()
+    backend()
         .run_event_loop(sixtyfps_corelib::backend::EventLoopQuitBehavior::QuitOnLastWindowClosed);
 }
 
@@ -417,7 +428,7 @@ pub fn run_event_loop() {
 /// it will return immediately and once control is passed back to the event loop,
 /// the initial call to [`run_event_loop()`] will return.
 pub fn quit_event_loop() {
-    sixtyfps_rendering_backend_default::backend().quit_event_loop();
+    backend().quit_event_loop();
 }
 
 /// Adds the specified function to an internal queue, notifies the event loop to wake up.
@@ -448,7 +459,7 @@ pub fn quit_event_loop() {
 /// handle.run();
 /// ```
 pub fn invoke_from_event_loop(func: impl FnOnce() + Send + 'static) {
-    sixtyfps_rendering_backend_default::backend().post_event(Box::new(func))
+    backend().post_event(Box::new(func))
 }
 
 /// This trait is used to obtain references to global singletons exported in `.60`

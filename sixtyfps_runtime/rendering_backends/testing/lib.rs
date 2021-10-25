@@ -168,6 +168,6 @@ impl PlatformWindow for TestingWindow {
 /// Initialize the testing backend.
 /// Must be called before any call that would otherwise initialize the rendering backend.
 /// Calling it when the rendering backend is already initialized will have no effects
-pub fn init() {
-    sixtyfps_corelib::backend::instance_or_init(|| Box::new(TestingBackend::default()));
+pub fn init() -> &'static dyn sixtyfps_corelib::backend::Backend {
+    sixtyfps_corelib::backend::instance_or_init(|| Box::new(TestingBackend::default()))
 }
